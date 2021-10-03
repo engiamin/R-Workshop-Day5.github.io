@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>TIME SERIES</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Day 5</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Time Series and Panel Analysis</a>
+</li>
+<li>
+  <a href="ts.html">TIME SERIES</a>
+</li>
+<li>
+  <a href="panel.html">PANEL ANALYSIS</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">TIME SERIES</h1>
+
+</div>
+
+
+<style type="text/css">
+  body{
+  font-size: 14pt;
+}
+</style>
+<style type="text/css">
+code.r{
+  font-size: 16px;
+}
+pre {
+  font-size: 16px
+}
+</style>
+<pre class="r"><code># Load needed packages
+library(ggplot2)
+library(readxl)
+library(zoo)
+library(xts)
+library(tseries)
+library(forecast)
+library(ggfortify)</code></pre>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># Read data 
+Day_5_Data &lt;- read_excel(&quot;Day 5 Data.xlsx&quot;, sheet = &quot;TS Data&quot;)</code></pre>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># Combine separate Year and Month columns into single Date Column
+Day_5_Data$Date &lt;- as.yearmon(paste(Day_5_Data$year, Day_5_Data$month), &quot;%Y %m&quot;)</code></pre>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># Convert data to timeseries object
+ts &lt;- xts(Day_5_Data[,-c(2:4)], order.by=as.Date(Day_5_Data$Date,
+                        format = &quot;%Y %m&quot;))</code></pre>
+<div style="margin-bottom:80px;">
+
+</div>
+<div id="explore-timeseries" class="section level1">
+<h1>Explore Timeseries</h1>
+<pre class="r"><code>ggplot(ts, aes(x = Index, y =num )) + 
+  geom_point()+
+  geom_line()+
+  scale_x_date(date_labels = &quot;%b %Y&quot;,date_breaks = &quot;2 year&quot;)+
+  scale_y_continuous(name=&quot;Number of Air Passengers (thousands)&quot;)+
+  geom_smooth(method = &quot;lm&quot;, se = FALSE,color=&quot;blue&quot;)+
+  theme_classic()</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># Restructure time series object for futher analysis
+ts_air &lt;- ts(ts,  start=c(1949,1), end=c(1960,12), frequency = 12)
+ts_air</code></pre>
+<pre><code>##      Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+## 1949 112 118 132 129 121 135 148 148 136 119 104 118
+## 1950 115 126 141 135 125 149 170 170 158 133 114 140
+## 1951 145 150 178 163 172 178 199 199 184 162 146 166
+## 1952 171 180 193 181 183 218 230 242 209 191 172 194
+## 1953 196 196 236 235 229 243 264 272 237 211 180 201
+## 1954 204 188 235 227 234 264 302 293 259 229 203 229
+## 1955 242 233 267 269 270 315 364 347 312 274 237 278
+## 1956 284 277 317 313 318 374 413 405 355 306 271 306
+## 1957 315 301 356 348 355 422 465 467 404 347 305 336
+## 1958 340 318 362 348 363 435 491 505 404 359 310 337
+## 1959 360 342 406 396 420 472 548 559 463 407 362 405
+## 1960 417 391 419 461 472 535 622 606 508 461 390 432</code></pre>
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="decompose-timeseries" class="section level1">
+<h1>Decompose Timeseries</h1>
+<pre class="r"><code># Plot components of time series
+decompose_ts &lt;- decompose(ts_air, &quot;multiplicative&quot;)
+plot(decompose_ts)</code></pre>
+<img src="ts_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="test-stationarity" class="section level1">
+<h1>Test Stationarity</h1>
+<pre class="r"><code># Use ADF test
+
+# The null hypothesis H0 : that the time series is non stationary
+# The alternative hypothesis HA : that the time series is stationary
+
+
+adf.test(ts_air, alternative =&quot;stationary&quot;, k=12)</code></pre>
+<pre><code>## 
+##  Augmented Dickey-Fuller Test
+## 
+## data:  ts_air
+## Dickey-Fuller = -1.5094, Lag order = 12, p-value = 0.7807
+## alternative hypothesis: stationary</code></pre>
+<pre class="r"><code># We accept the null hypothesis. From the above p-value, we conclude that the time series is non-stationary.</code></pre>
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="make-series-stationary" class="section level1">
+<h1>Make Series Stationary</h1>
+<pre class="r"><code># 1.Remove unequal variance using log of time series 
+# 2.Address the trend componant, do this by taking difference
+
+plot(diff(log(ts_air))) # Looks better</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="find-optimal-parameters" class="section level1">
+<h1>Find Optimal Parameters</h1>
+<pre class="r"><code># 1.a. Look at original autocorrelation graph
+Acf(ts_air,plot=TRUE) # There is high autocorrelation</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># 1.b. Look at transformed  autocorrelation graph
+Acf(diff(log(ts_air))) #looks better</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># 2.a. Look at original partial autocorrelation graph
+Pacf(ts_air) </code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<div style="margin-bottom:50px;">
+
+</div>
+<pre class="r"><code># 2.b. Look at the transformed partial autocorrelation graph
+Pacf(diff(log(ts_air))) </code></pre>
+<img src="ts_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+<div style="margin-bottom:50px;">
+
+</div>
+<p>The ACF/PACF plot give us suggestions on what degree of parameters to utilize. If the ACF had a smooth, geometric decay and the PACF a cutoff at lag p, we would utilize a pure AR(p) model. Given that the ACF shows no pattern of a smooth decay and decays to insignificance after lag 1, we will build an MA(1) model to fit the data. We will choose d = 1 as our degree of differencing, evidenced by our earlier call of the diff function.</p>
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="build-arima-model" class="section level1">
+<h1>Build ARIMA Model</h1>
+<p>R, THANKFULLY, has an <code>auto.arima</code> function that determines the optimal parameters for our time series.</p>
+<pre class="r"><code>arimaAP &lt;- auto.arima(ts_air)
+arimaAP</code></pre>
+<pre><code>## Series: ts_air 
+## ARIMA(2,1,1)(0,1,0)[12] 
+## 
+## Coefficients:
+##          ar1     ar2      ma1
+##       0.5960  0.2143  -0.9819
+## s.e.  0.0888  0.0880   0.0292
+## 
+## sigma^2 estimated as 132.3:  log likelihood=-504.92
+## AIC=1017.85   AICc=1018.17   BIC=1029.35</code></pre>
+<p>The ARIMA(2,1,1)(0,1,0)[12] model parameters are lag 1 differencing (d), an autoregressive term of second lag (p) and a moving average model of order 1 (q). Then the seasonal model has an autoregressive term of first lag (D) at model period 12 units, in this case months.</p>
+<pre class="r"><code># Look at model diagnostics
+ggtsdiag(arimaAP)</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>The residual plots appear to be centered around 0 as noise, with no pattern. the arima model is a fairly good fit.</p>
+<div style="margin-bottom:80px;">
+
+</div>
+</div>
+<div id="forecast" class="section level1">
+<h1>Forecast</h1>
+<p>Finally we can plot a forecast of the time series using the <code>forecast</code> function.</p>
+<pre class="r"><code># Forecast the next 36 months
+forecastAP &lt;- forecast(arimaAP, level = c(95), h = 36)
+autoplot(forecastAP)</code></pre>
+<p><img src="ts_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
